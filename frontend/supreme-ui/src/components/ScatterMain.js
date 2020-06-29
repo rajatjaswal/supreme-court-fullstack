@@ -71,9 +71,6 @@ export class ScatterMain extends React.Component {
                     xTitle={this.state.xVar}
                     yTitle={this.state.yVar}
                     zTitle={this.state.zVar}
-                    width='800'
-                    height='500'
-                    labelsWidth='300'
                     data={allData}
                     allOptions = {allOptions}
                     />

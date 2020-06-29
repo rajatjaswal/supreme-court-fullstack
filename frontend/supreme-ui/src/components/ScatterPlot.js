@@ -86,8 +86,8 @@ class ScatterPlot extends Component {
     }
 
     updateLabels() {
-        const dots = d3.select(this.labelArea).selectAll('dots').data(this.props.allOptions);
-        const labels = d3.select(this.labelArea).selectAll('labels').data(this.props.allOptions);
+        const dots = d3.select(this.labelArea).selectAll('circle').data(this.props.allOptions);
+        const labels = d3.select(this.labelArea).selectAll('text').data(this.props.allOptions);
 
         const color = d3.scaleOrdinal()
         .domain(this.props.allOptions)
@@ -99,6 +99,7 @@ class ScatterPlot extends Component {
         dots
             .enter()
             .append("circle")
+            .merge(dots)
             .attr("cx", 0)
             .attr("cy", function(d,i){ return i*(size+5)}) // 100 is where the first dot appears. 25 is the distance between dots
             .attr("r", 5)
@@ -107,12 +108,13 @@ class ScatterPlot extends Component {
         labels
             .enter()
             .append("text")
-              .attr("x", size*1.2)
-              .attr("y", function(d,i){ return i*(size+5)}) // 100 is where the first dot appears. 25 is the distance between dots
-              .style("fill", (d) => color(d))
-              .text(function(d){ return d})
-              .attr("text-anchor", "left")
-              .style("alignment-baseline", "middle")
+            .merge(labels)
+            .attr("x", size*1.2)
+            .attr("y", function(d,i){ return i*(size+5)}) // 100 is where the first dot appears. 25 is the distance between dots
+            .style("fill", (d) => color(d))
+            .text(function(d){ return d})
+            .attr("text-anchor", "left")
+            .style("alignment-baseline", "middle")
         
 
         dots.exit().remove();
@@ -161,8 +163,8 @@ class ScatterPlot extends Component {
 }
 ScatterPlot.defaultProps = {
     data: [{ x: 10, y: 20 }, { x: 15, y: 35 }],
-    width: 300,
-    height: 300,
+    width: 800,
+    height: 500,
     radius: 5,
     color: "blue",
     margin: {
@@ -173,6 +175,9 @@ ScatterPlot.defaultProps = {
     },
     xTitle: "X Title",
     yTitle: "Y Title",
+    zTitle: "Z Title",
+    labelsWidth: 300,
+    options: []
 };
       
 export default ScatterPlot;
