@@ -10,18 +10,6 @@ const process = name => {
     return csv
 }
 
-// const processCSVByDate = name => {
-//     const raw = fs.readFileSync(`${__dirname}/static/${name}`, 'utf8')
-//     const csv = d3.csvParse(raw, (row) => {
-//         return {
-//             caseId: row.caseId,
-//             startDate: row.dateArgument,
-//             endDate: row.dateDecision
-//         }
-//     });
-//     return csv;
-// }
-
 export const getAllJusticeData = async () => {
     const data = await axios.get('http://frontend-exercise-api.herokuapp.com/justices/')
     .then(response => {
@@ -56,10 +44,31 @@ export const dateBasedCases = (entries) => {
     return res;
 }
 
-export const getJusticeBasedCases = (entries) => {
+export const getJusticeBasedCases = (entries, allJustices) => {
     const changed = d3.nest()
-    .key(d => d.justiceName)
-    .rollup(v => v.length)
-    .entries(entries);
+    .key(d => {
+        return d.justiceName
+    })
+    .rollup(v => {
+        const justice = allJustices.find(j => j.name_2 === v[0].justiceName);
+        if(justice === undefined) {
+            return{};
+        }
+        const difference = Math.abs(new Date(justice.finish_date) - new Date(justice.start_date)) / 1000;
+        const duration = Math.floor(difference / (86400*365));
+        return {
+            cases: v.length,
+            duration,
+            justice_info: {
+                name: justice.name,
+                start_date: justice.start_date,
+                finish_date: justice.finish_date,
+                nominating_party: justice.nominating_party,
+                military_service: justice.military_service,
+                law_school: justice.law_school
+            }
+        }
+    })
+    .object(entries);
     return changed;
 }
