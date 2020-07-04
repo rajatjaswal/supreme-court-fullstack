@@ -1,8 +1,8 @@
 import React, {Component} from 'react';
 import * as d3 from "d3";
 import d3Tip from "d3-tip";
-import styles from '../styles/styles.css';
-import { slider_snap } from './Slider';
+import '../styles/styles.css';
+// import { slider_snap } from './Slider';
 
 class CascadingPlot extends Component {
     constructor(props) {

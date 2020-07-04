@@ -23,7 +23,6 @@ export class CascadingMain extends React.Component {
     }
     render() {
         
-        const options = ["startDate","endDate"];
         const allData = this.state.data
             .map((d, idx) => {
             return {

@@ -78,7 +78,7 @@ export const slider_snap = (min, max, sliderArea) => {
   
     // add brush handles (from https://bl.ocks.org/Fil/2d43867ba1f36a05459c7113c7f6f98a)
     var brushResizePath = function(d) {
-        var e = +(d.type == "e"),
+        var e = +(d.type === "e"),
             x = e ? 1 : -1,
             y = height / 2;
         return "M" + (.5 * x) + "," + y + "A6,6 0 0 " + e + " " + (6.5 * x) + "," + (y + 6) + "V" + (2 * y - 6) +

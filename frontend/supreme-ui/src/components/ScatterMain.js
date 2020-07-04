@@ -1,5 +1,7 @@
 import React from 'react';
 import ScatterPlot from './ScatterPlot';
+import ToggleButtonGroup from 'react-bootstrap/ToggleButtonGroup';
+import ToggleButton from 'react-bootstrap/ToggleButton';
 
 export class ScatterMain extends React.Component {
     constructor(props) {
@@ -23,8 +25,8 @@ export class ScatterMain extends React.Component {
     render() {
         // Get list of x,y,z variables
         
-        const options = ['duration','cases'];
-        const infoOptions = ['law_school', 'military_service', 'nominating_party'];
+        const options = [['cases','# of cases judged'],['duration','Duration of term']];
+        const infoOptions = [['law_school','Law School'], ['military_service','Military Experience'], ['nominating_party','Party Appointed By']];
 
         // Store all of the data to be plotted 
         const allJustices = Object.keys(this.state.data);
@@ -46,24 +48,34 @@ export class ScatterMain extends React.Component {
                 <div className="control-container">
 
                     {/* Y Variable Select Menu */}
-                    <div className="control-wrapper">
-                        <label htmlFor="yVar">Y Variable:</label>
-                        <select id="yVar" value={this.state.yVar} className="custom-select" onChange={(d) => this.setState({ yVar: d.target.value })}>
+                    <div className="select-yAxis">
+                        <span>Y Axis: </span>
+                        <ToggleButtonGroup
+                            type='radio'
+                            name='yVar'
+                            value={this.state.yVar}
+                            onChange={(d)=> this.setState({yVar: d})}
+                            style={{marginLeft:"10px"}}
+                        >
                             {options.map((d) => {
-                                return <option key={d}>{d}</option>
+                                return <ToggleButton variant="info" value={d[0]}>{d[1]}</ToggleButton>
                             })}
-                        </select>
+                        </ToggleButtonGroup>
                     </div>
-
-                    {/* Y Variable Select Menu */}
-                    <div className="control-wrapper">
-                        <label htmlFor="zVar">More Information</label>
-                        <select id="zVar" value={this.state.zVar} className="custom-select" onChange={(d) => this.setState({ zVar: d.target.value })}>
+                    <div className="select-color">
+                        <span>Color: </span>
+                        <ToggleButtonGroup
+                            type='radio'
+                            name='color'
+                            value={this.state.zVar}
+                            onChange={(d)=> this.setState({zVar: d})}
+                            style={{marginLeft:"10px"}}
+                        >
                             {infoOptions.map((d) => {
-                                return <option key={d}>{d}</option>
+                                return <ToggleButton variant="light" value={d[0]}>{d[1]}</ToggleButton>
                             })}
-                        </select>
-                    </div>                         
+                        </ToggleButtonGroup>
+                    </div>
                 </div>
 
                 {/* Render scatter plot */}
