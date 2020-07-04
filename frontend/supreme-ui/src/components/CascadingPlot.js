@@ -1,8 +1,10 @@
 import React, {Component} from 'react';
 import * as d3 from "d3";
 import d3Tip from "d3-tip";
+import styles from '../styles/styles.css';
+import { slider_snap } from './Slider';
 
-class ScatterPlot extends Component {
+class CascadingPlot extends Component {
     constructor(props) {
         super(props);
         // Graph width and height - accounting for margins
@@ -31,68 +33,126 @@ class ScatterPlot extends Component {
             .range([0, this.drawWidth])
         this.yScale = d3.scaleLinear().domain([yMax, yMin]).range([0, this.drawHeight])
     }
-      
+    
+    fetchTooltip(target, d, tip) {
+        fetch(`http://localhost:3500/cases/${d.label}`).then(res => res.json()).then(x => {
+            const dNew = new Object(d);
+            dNew['justices'] = x.justices;
+            dNew['dateDecision'] = x.dateDecision;
+            dNew['dateArgument'] = x.dateArgument;
+            dNew['dateRearg'] = x.dateRearg;
+            tip.show(dNew, target);
+        });
+    }
+
     updatePoints() {
         // Define hovers 
         // Add tip
-        let tip = d3Tip().attr('class', 'd3-tip').html(function (d) {
-            return d.label;
+        let tip = d3Tip().attr('class', 'd3-tip').html((d) => {
+            const id = d.label;
+            let justices = '<ul style="padding-left: 15px; margin-top: 0">';
+            d.justices.forEach(e => {
+                justices+=`<li>${e}</li>`;
+            });
+            justices+="</ul>";
+            return `<div class="tip-body" style="font-size: 10px; background-color: black; color: white; padding: 10px; border-radius: 10px">
+                    <p>Case ID - <span>${id}</span></p>
+                    <p style="margin: 0; margin-bottom: 5px">Justices</p>
+                    ${justices}
+                    <p style="margin: 0">Decision Date - <span>${d.dateDecision}</span></p>
+                    <p style="margin: 0">Argument Date - <span>${d.dateArgument}</span></p>
+                    <p style="margin: 0">ReArgument Date - <span>${d.dateRearg}</span></p>
+                 </div>`;
         });
 
-        // Select all circles and bind data
-        const color = d3.scaleOrdinal()
-        .domain(this.props.allOptions)
-        .range(d3.schemeDark2);
-
         let circles = d3.select(this.chartArea).selectAll('circle').data(this.props.data);
+        let lines = d3.select(this.chartArea).selectAll('line').data(this.props.data);
 
-        // Use the .enter() method to get your entering elements, and assign their positions
-        circles.enter().append('circle')
-            .merge(circles)
-            .attr('r', (d) => this.props.radius)
-            .attr('fill', (d) => color(d.z))
-            .attr('label', (d) => d.label)
-            .on('mouseover', tip.show)
-            .on('mouseout', tip.hide)
-            .style('fill-opacity', 0.6)
-            .transition().duration(700)
-            .attr('cx', (d) => this.xScale(d.x))
+        // Define the circle variables
+        const radius = 4;
+        // Add the first circle
+        circles.enter()
+            .append('circle')
+            .attr('cx', (d) => {
+                return this.xScale(d.x)
+            })
             .attr('cy', (d) => this.yScale(d.y))
-            .style('stroke', "black")
-            .style('stroke-width', (d) => d.selected === true ? "3px" : "0px")
+            .attr('r', radius)
+            .style('fill', 'red')
+            .on('mouseover', (d) => {
+                var target = d3.event.target;
+                this.fetchTooltip(target, d, tip);
+            })
+            .on('mouseout', tip.hide);
+        
+        lines
+            .enter()
+            .append('line')
+            .attr('x1',d => this.xScale(d.x))
+            .attr('x2',d => this.xScale(d.e))
+            .attr('y1',d => this.yScale(d.y))
+            .attr('y2',d => this.yScale(d.y))
+            .attr('stroke', 'black')
+            .attr('fill', 'black')
+            .on('mouseover', (d) => {
+                var target = d3.event.target;
+                this.fetchTooltip(target, d, tip);
+            })
+            .on('mouseout', tip.hide);
 
+            // Add the second circle
+            circles.enter()
+            .append('circle')
+            .attr('cx', (d) => {
+                return this.xScale(d.e)
+            })
+            .attr('cy', (d)=> this.yScale(d.y))
+            .attr('r', radius)
+            .style('fill', 'green')
+            .on('mouseover', (d) => {
+                var target = d3.event.target;
+                this.fetchTooltip(target, d, tip);
+            })
+            .on('mouseout', tip.hide);
 
-        // Use the .exit() and .remove() methods to remove elements that are no longer in the data
-        circles.exit().transition()
-        .attr("r", 0).remove();      
-        d3.select(this.chartArea).call(tip);
+            d3.select(this.chartArea).call(tip);
+
     }
 
     updateAxes() {
         let xAxisFunction = d3.axisBottom(this.xScale)
-            .tickFormat(d3.timeFormat("%b-%Y"))
-            .ticks(4)
-            .tickPadding(2);
+            .tickFormat(d3.timeFormat("%d-%b-%Y"))
+            .ticks(10)
+            .tickPadding(1);
 
         let yAxisFunction = d3.axisLeft()
             .scale(this.yScale)
             .ticks(5, 's');
 
         d3.select(this.xAxis)
-            .call(xAxisFunction);
+            .append("g")			
+            .attr("class", "grid")
+            .call(xAxisFunction
+                .tickSize(-this.props.height)
+            )
 
         d3.select(this.yAxis)
             .call(yAxisFunction);
     }
 
+
+    update() {
+        this.updateScales();
+        this.updateAxes();
+        this.updatePoints();
+        this.updateLabels();
+        // slider_snap(100, 200, this.sliderArea);
+    }
+
     updateLabels() {
         const dots = d3.select(this.labelArea).selectAll('circle').data(this.props.allOptions);
         const labels = d3.select(this.labelArea).selectAll('text').data(this.props.allOptions);
-
-        const color = d3.scaleOrdinal()
-        .domain(this.props.allOptions)
-        .range(d3.schemeDark2);
-        const size = 10;
+        const size = 20;
 
         dots
             .enter()
@@ -101,7 +161,7 @@ class ScatterPlot extends Component {
             .attr("cx", 0)
             .attr("cy", function(d,i){ return i*(size+5)}) // 100 is where the first dot appears. 25 is the distance between dots
             .attr("r", 5)
-            .style("fill", (d) => color(d))
+            .style("fill", (d) => d.color)
 
         labels
             .enter()
@@ -109,8 +169,8 @@ class ScatterPlot extends Component {
             .merge(labels)
             .attr("x", size*1.2)
             .attr("y", function(d,i){ return i*(size+5)}) // 100 is where the first dot appears. 25 is the distance between dots
-            .style("fill", (d) => color(d))
-            .text(function(d){ return d})
+            .style("fill", (d) => d.color)
+            .text(d => d.label)
             .attr("text-anchor", "left")
             .style("alignment-baseline", "middle")
         
@@ -118,13 +178,6 @@ class ScatterPlot extends Component {
         dots.exit().remove();
         labels.exit().remove();
 
-    }
-
-    update() {
-        this.updateScales();
-        this.updateAxes();
-        this.updatePoints();
-        this.updateLabels();
     }
           
     render() {
@@ -148,10 +201,13 @@ class ScatterPlot extends Component {
                     <text className="axis-label" transform={`translate(${this.props.margin.left - 30}, 
                         ${this.drawHeight / 2 + this.props.margin.top}) rotate(-90)`}>{this.props.yTitle}</text>
                 </svg>
-
                 <svg className="labels" width={this.props.labelsWidth} height={this.props.height}>
                     <text transform={`translate(${this.props.margin.left},15)`}>{this.props.title}</text>
                     <g ref={(node) => { this.labelArea = node; }}
+                        transform={`translate(${this.props.margin.left}, ${this.props.margin.top})`} />
+                </svg>
+                <svg className="slider" width={this.props.width} height={100}>
+                    <g ref={(node) => { this.sliderArea = node; }}
                         transform={`translate(${this.props.margin.left}, ${this.props.margin.top})`} />
                 </svg>
             </div>
@@ -159,7 +215,7 @@ class ScatterPlot extends Component {
         )
     }
 }
-ScatterPlot.defaultProps = {
+CascadingPlot.defaultProps = {
     data: [{ x: 10, y: 20 }, { x: 15, y: 35 }],
     width: 800,
     height: 500,
@@ -173,9 +229,8 @@ ScatterPlot.defaultProps = {
     },
     xTitle: "X Title",
     yTitle: "Y Title",
-    zTitle: "Z Title",
     labelsWidth: 300,
     options: []
 };
       
-export default ScatterPlot;
+export default CascadingPlot;

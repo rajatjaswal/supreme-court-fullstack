@@ -1,4 +1,4 @@
-import { getJusticeEntries, getJusticeDetails, getAllCases } from "../controllers/controller";
+import { getJusticeEntries, getJusticeDetails, getAllCases, getDateBasedCases, getIdBasedCase } from "../controllers/controller";
 
 export const routes = (app, allCases, justiceEntries, allJustices, dateCases) =>{
     app.route("/justice/")
@@ -14,4 +14,10 @@ export const routes = (app, allCases, justiceEntries, allJustices, dateCases) =>
 
     app.route("/cases/")
         .get((req, res )=> getAllCases(req, res, dateCases))
+    
+    app.route("/cases/date")
+        .get((req, res )=> getDateBasedCases(req, res, dateCases))
+
+    app.route("/cases/:caseID")
+        .get((req, res )=> getIdBasedCase(req, res, allCases))
 }

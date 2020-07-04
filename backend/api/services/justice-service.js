@@ -29,10 +29,7 @@ export const getDataFromCSV = () => {
 
 export const dateBasedCases = (entries) => {
     const nonUnique = entries
-    .filter( (c) => {
-        const startDate = c.dateArgument === "" ? c.dateRearg : c.dateArgument;
-        return startDate !== "";
-    })
+    .filter(filterEntriesWithNoDate)
     .map( (c) => {
         const caseId = {};
         caseId['id'] = c.caseId;
@@ -42,6 +39,23 @@ export const dateBasedCases = (entries) => {
     });
     const res = [...new Map(nonUnique).values()];
     return res;
+}
+
+const filterEntriesWithNoDate = (c) => {
+    const startDate = c.dateArgument === "" ? c.dateRearg : c.dateArgument;
+    return startDate !== "";
+}
+
+const filterWithinDate = (c, startDate, endDate) => {
+    const start =  new Date(c.startDate) >= startDate 
+    const end = new Date(c.endDate) <= endDate;
+    return start && end;
+}
+
+export const dateBasedCasesWithin = (allCases, startDate, endDate) => {
+    const dateCases = allCases
+    .filter(c => filterWithinDate(c, startDate, endDate));
+    return dateCases;
 }
 
 export const getJusticeBasedCases = (entries, allJustices) => {
@@ -71,4 +85,18 @@ export const getJusticeBasedCases = (entries, allJustices) => {
     })
     .object(entries);
     return changed;
+}
+
+export const idBasedCases = (entries, id) => {
+    const cases = entries.filter(c => c.caseId === id);
+    if(cases.length==0) return null;
+    const justices = cases.map(c => c.justiceName)
+    const res = {};
+    res['id'] = id;
+    res['justices'] = justices;
+    res['dateDecision'] = cases[0].dateDecision;
+    res['dateArgument'] = cases[0].dateArgument;
+    res['dateRearg'] = cases[0].dateRearg;
+    
+    return res;
 }
