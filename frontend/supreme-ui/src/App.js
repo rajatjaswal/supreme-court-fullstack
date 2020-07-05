@@ -1,13 +1,22 @@
 import React from 'react';
 import './App.css';
-import { ScatterMain } from './components/ScatterMain';
-import { CascadingMain } from './components/CascadingMain';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import Visualizations from './components/Visualizations';
+import Home from './components/Home';
+import Tabs from 'react-bootstrap/Tabs';
+import Tab from 'react-bootstrap/Tab';
 
 function App() {
   return (
     <div className="App">
-      <ScatterMain />
-      <CascadingMain />
+      <Tabs defaultActiveKey="home" id="uncontrolled-tab-example">
+        <Tab eventKey="home" title="Home">
+          <Home />
+        </Tab>
+        <Tab eventKey="visualizations" title="Visualizations">
+          <Visualizations />
+        </Tab>
+      </Tabs>
     </div>
   );
 }

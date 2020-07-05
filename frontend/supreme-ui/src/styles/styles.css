@@ -13,3 +13,9 @@
 .grid path {
     stroke-width: 0;
 }
+.select-yAxis {
+    float: left;
+}
+.select-color{
+    float: right;
+}

@@ -19,6 +19,10 @@ export const getAllCases = (req, res, dateCases) => {
     return res.status(200).send(dateCases);
 }
 
+export const getAllCasesLen = (req, res, len) => {
+    return res.status(200).send({'length':len});
+}
+
 export const getDateBasedCases = (req, res, dateCases) => {
     const startDate = new Date(req.query.startDate);
     const endDate = new Date(req.query.endDate);

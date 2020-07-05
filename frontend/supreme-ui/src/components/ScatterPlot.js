@@ -114,7 +114,6 @@ class ScatterPlot extends Component {
             .attr("text-anchor", "left")
             .style("alignment-baseline", "middle")
         
-
         dots.exit().remove();
         labels.exit().remove();
 
