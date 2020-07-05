@@ -58,7 +58,7 @@ export class ScatterMain extends React.Component {
                             style={{marginLeft:"10px"}}
                         >
                             {options.map((d) => {
-                                return <ToggleButton variant="info" value={d[0]}>{d[1]}</ToggleButton>
+                                return <ToggleButton key={d[0]} variant="info" value={d[0]}>{d[1]}</ToggleButton>
                             })}
                         </ToggleButtonGroup>
                     </div>
@@ -72,7 +72,7 @@ export class ScatterMain extends React.Component {
                             style={{marginLeft:"10px"}}
                         >
                             {infoOptions.map((d) => {
-                                return <ToggleButton variant="light" value={d[0]}>{d[1]}</ToggleButton>
+                                return <ToggleButton key={d[0]} variant="light" value={d[0]}>{d[1]}</ToggleButton>
                             })}
                         </ToggleButtonGroup>
                     </div>

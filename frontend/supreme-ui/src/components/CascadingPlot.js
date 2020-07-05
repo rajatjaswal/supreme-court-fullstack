@@ -2,7 +2,6 @@ import React, {Component} from 'react';
 import * as d3 from "d3";
 import d3Tip from "d3-tip";
 import '../styles/styles.css';
-// import { slider_snap } from './Slider';
 
 class CascadingPlot extends Component {
     constructor(props) {
@@ -73,6 +72,7 @@ class CascadingPlot extends Component {
         // Add the first circle
         circles.enter()
             .append('circle')
+            .merge(circles)
             .attr('cx', (d) => {
                 return this.xScale(d.x)
             })
@@ -88,6 +88,7 @@ class CascadingPlot extends Component {
         lines
             .enter()
             .append('line')
+            .merge(lines)
             .attr('x1',d => this.xScale(d.x))
             .attr('x2',d => this.xScale(d.e))
             .attr('y1',d => this.yScale(d.y))
@@ -100,9 +101,10 @@ class CascadingPlot extends Component {
             })
             .on('mouseout', tip.hide);
 
-            // Add the second circle
-            circles.enter()
+        // Add the second circle
+        circles.enter()
             .append('circle')
+            .merge(circles)
             .attr('cx', (d) => {
                 return this.xScale(d.e)
             })
@@ -115,7 +117,10 @@ class CascadingPlot extends Component {
             })
             .on('mouseout', tip.hide);
 
-            d3.select(this.chartArea).call(tip);
+        circles.exit().remove();
+        lines.exit().remove();
+
+        d3.select(this.chartArea).call(tip);
 
     }
 
@@ -204,10 +209,6 @@ class CascadingPlot extends Component {
                 <svg className="labels" width={this.props.labelsWidth} height={this.props.height}>
                     <text transform={`translate(${this.props.margin.left},15)`}>{this.props.title}</text>
                     <g ref={(node) => { this.labelArea = node; }}
-                        transform={`translate(${this.props.margin.left}, ${this.props.margin.top})`} />
-                </svg>
-                <svg className="slider" width={this.props.width} height={100}>
-                    <g ref={(node) => { this.sliderArea = node; }}
                         transform={`translate(${this.props.margin.left}, ${this.props.margin.top})`} />
                 </svg>
             </div>

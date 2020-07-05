@@ -1,5 +1,6 @@
 import React from 'react';
 import CascadingPlot from './CascadingPlot';
+import { Slider } from './Slider';
 
 export class CascadingMain extends React.Component {
     constructor(props) {
@@ -10,19 +11,23 @@ export class CascadingMain extends React.Component {
             data: [],
             xVar: 'startDate',
             yVar: 'case',
-            startDate: '8/2/1791',
-            endDate: '8/2/1800'
+            startDate: new Date('8/2/1791').getTime(),
+            endDate: new Date('8/2/1830').getTime()
         };
     }
 
-    componentDidMount() {
-        // Load data when the component mounts
-        fetch(`http://localhost:3500/cases/date?startDate=${this.state.startDate}&endDate=${this.state.endDate}`).then(res => res.json()).then((res) => {
-            this.setState({data: res})
-        })
+    componentWillUpdate(prevProps, prevState) {
+        if(this.state.startDate !== prevState.startDate || this.state.endDate !== prevState.endDate ){
+            const startDate = new Date(parseInt(this.state.startDate)).toISOString();
+            const endDate = new Date(parseInt(this.state.endDate)).toISOString();
+            // Load data when the component mounts
+            fetch(`http://localhost:3500/cases/date?startDate=${startDate}&endDate=${endDate}`).then(res => res.json()).then((res) => {
+                this.setState({data: res})
+            })
+        } 
     }
+
     render() {
-        
         const allData = this.state.data
             .map((d, idx) => {
             return {
@@ -45,6 +50,13 @@ export class CascadingMain extends React.Component {
                     data={allData}
                     allOptions = {allOptions}
                     />
+                <Slider 
+                    minDate="01/01/1971" 
+                    maxDate="12/01/2010" 
+                    start={this.state.startDate} 
+                    end={this.state.endDate} 
+                    onChange={(date)=> this.setState({startDate: date[0], endDate: date[1]})}
+                />
             </div>
         )
     }
