@@ -3,20 +3,37 @@ import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Visualizations from './components/Visualizations';
 import Home from './components/Home';
-import Tabs from 'react-bootstrap/Tabs';
-import Tab from 'react-bootstrap/Tab';
+import {Nav, Button} from 'react-bootstrap';
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  NavLink
+} from "react-router-dom";
+import { Details } from './components/Details';
 
 function App() {
   return (
     <div className="App">
-      <Tabs defaultActiveKey="home" id="uncontrolled-tab-example">
-        <Tab eventKey="home" title="Home">
-          <Home />
-        </Tab>
-        <Tab eventKey="visualizations" title="Visualizations">
-          <Visualizations />
-        </Tab>
-      </Tabs>
+      <Router>
+        <NavLink className="navLink" to="/home">Home</NavLink>
+        <NavLink className="navLink"
+          to="/visualization"
+        >
+        Visualization
+        </NavLink>
+        <Switch>
+          <Route path="/visualization">
+            <Visualizations />
+          </Route>
+          <Route path="/home">
+            <Home />
+          </Route>
+          <Route path="/details">
+            <Details />
+          </Route>
+        </Switch>
+    </Router>
     </div>
   );
 }
