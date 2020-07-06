@@ -14,7 +14,7 @@ export class CascadingMain extends React.Component {
             xVar: 'startDate',
             yVar: 'case',
             startDate: '8/2/1791',
-            endDate: '8/2/1810',
+            endDate: '8/2/1800',
         };
     }
 
