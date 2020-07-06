@@ -10,6 +10,20 @@
   pointer-events: none;
 }
 
+.navLink{
+  padding: .5rem 1rem;
+  color: #007bff;
+  text-decoration: none;
+  background-color: transparent;
+  border-radius: .25rem;
+  display: inline-block;
+}
+
+.navLink.active{
+  color: #fff;
+  background-color: #007bff;
+}
+
 @media (prefers-reduced-motion: no-preference) {
   .App-logo {
     animation: App-logo-spin infinite 20s linear;

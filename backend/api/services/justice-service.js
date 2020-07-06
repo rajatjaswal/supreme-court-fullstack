@@ -23,7 +23,10 @@ export const getAllJusticeData = async () => {
 
 export const getDataFromCSV = () => {
     var files = fs.readdirSync(`${__dirname}/static`)
-    const entries = _.flatMap(files, filename => process(filename));
+    const entries = _.flatMap(files, filename => process(filename)).filter(c => {
+        if(c.dateRearg === "" && c.dateArgument === "") return false;
+        return true;
+    });
     return entries;
 }
 
@@ -68,11 +71,23 @@ export const getJusticeBasedCases = (entries, allJustices) => {
         if(justice === undefined) {
             return{};
         }
+        const meanCaseDuration = d3.mean(v, (d)=>{
+            const end = d.dateDecision;
+            const dateArg = d.dateArgument;
+            const dateRearg = d.dateRearg;
+
+            const start = dateArg === "" ? dateRearg: dateArg;
+            const diff = Math.abs(new Date(end) - new Date(start)) / 1000;
+            const len = Math.floor(diff / (86400));
+            return len;
+        })
+
         const difference = Math.abs(new Date(justice.finish_date) - new Date(justice.start_date)) / 1000;
         const duration = Math.floor(difference / (86400*365));
         return {
             cases: v.length,
             duration,
+            meanCaseDuration,
             justice_info: {
                 name: justice.name,
                 start_date: justice.start_date,

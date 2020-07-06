@@ -1,5 +1,6 @@
 import React from 'react';
 import {Container, Row, Col, Card} from 'react-bootstrap'
+import {NavLink} from 'react-router-dom';
 
 class SummaryStats extends React.Component{
     constructor(props){
@@ -10,7 +11,8 @@ class SummaryStats extends React.Component{
             numCases: 0,
             averageDuration: 0,
             mostParty:"",
-            mostLawSchool:""
+            mostLawSchool:"",
+            fastestLawSchools:[]
         };
     }
 
@@ -21,32 +23,34 @@ class SummaryStats extends React.Component{
             let avg = 0;
             const party={};
             const lawSchool = {};
-            justices.forEach(j => {
+            const lawSchoolCaseDuration = {};
+
+            justices.filter(j => res[j].justice_info !==undefined).forEach(j => {
                 avg+=res[j].duration === undefined ? 0: parseInt(res[j].duration);
-                if(res[j].justice_info !==undefined){
-                    if(party[res[j].justice_info.nominating_party] === undefined){
-                        party[res[j].justice_info.nominating_party] = 0;
-                    }
-                    party[res[j].justice_info.nominating_party]++;
+                if(party[res[j].justice_info.nominating_party] === undefined){
+                    party[res[j].justice_info.nominating_party] = 0;
                 }
+                party[res[j].justice_info.nominating_party]++;
 
-                if(res[j].justice_info !==undefined){
-                    if(lawSchool[res[j].justice_info.law_school] === undefined){
-                        lawSchool[res[j].justice_info.law_school] = 0;
-                    }
-                    lawSchool[res[j].justice_info.law_school]++;
+                if(lawSchool[res[j].justice_info.law_school] === undefined){
+                    lawSchool[res[j].justice_info.law_school] = {}
+                    lawSchool[res[j].justice_info.law_school].count = 0;
+                    lawSchool[res[j].justice_info.law_school].meanCaseDuration = 0;
                 }
-
+                lawSchool[res[j].justice_info.law_school].count++;
+                lawSchool[res[j].justice_info.law_school].meanCaseDuration+=res[j].meanCaseDuration;
             });
 
             const maxParty = [...Object.entries(party)].reduce((a, e ) => e[1] > a[1] ? e : a);
-            const maxLaw = [...Object.entries(lawSchool)].reduce((a, e ) => e[1] > a[1] ? e : a);
+            const maxLaw = [...Object.entries(lawSchool)].reduce((a, e ) => e[1].count > a[1].count ? e : a);
+            const fastestLawSchools = [...Object.entries(lawSchool)].sort((a,b)=> (a[1].meanCaseDuration/a[1].count)-b[1].meanCaseDuration/b[1].count).slice(0,5);
             this.setState(
                 {
                     numJustices: justices.length, 
                     averageDuration: parseInt(avg/justices.length),
                     mostParty: maxParty[0],
-                    mostLawSchool: maxLaw[0]
+                    mostLawSchool: maxLaw[0],
+                    fastestLawSchools,
                 }
             );
         })
@@ -56,6 +60,11 @@ class SummaryStats extends React.Component{
         return (
             <div className="SummaryStats">
                 <Container>
+                    <Row>
+                        <Col>
+                            <NavLink className="navLink" to="/details">View Details</NavLink>
+                        </Col>
+                    </Row>
                     <Row>
                         <Col>
                             <Card>
@@ -94,6 +103,20 @@ class SummaryStats extends React.Component{
                                 <Card.Body>
                                     <h4><strong>{this.state.mostLawSchool}</strong></h4>
                                     <p>Most Represented Law School</p>
+                                </Card.Body>
+                            </Card>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col>
+                            <Card>
+                                <Card.Body>
+                                    <p>Top Law Schools with Fastest Justices</p>
+                                    <ul>
+                                    {this.state.fastestLawSchools.map(l => {
+                                        return <li key ={l[0]}><strong>{l[0]}</strong></li>
+                                    })}
+                                    </ul>
                                 </Card.Body>
                             </Card>
                         </Col>
