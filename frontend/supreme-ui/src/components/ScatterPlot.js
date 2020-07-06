@@ -36,7 +36,10 @@ class ScatterPlot extends Component {
         // Define hovers 
         // Add tip
         let tip = d3Tip().attr('class', 'd3-tip').html(function (d) {
-            return d.label;
+            return `<div class="tip-body" style="font-size: 10px; background-color: black; color: white; padding: 10px; border-radius: 10px">
+                <p style="margin: 0; margin-bottom: 5px">${d.label}</p>
+                <p style="margin: 0">Cases - ${d.y}</p>
+            </div>`;
         });
 
         // Select all circles and bind data
