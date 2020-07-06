@@ -64,15 +64,15 @@ class CascadingPlot extends Component {
                  </div>`;
         });
 
-        let circles = d3.select(this.chartArea).selectAll('circle').data(this.props.data);
-        let lines = d3.select(this.chartArea).selectAll('line').data(this.props.data);
-
+        const redCircles = d3.select(this.chartArea).selectAll('circle').data(this.props.data);
+        const greenCircles = d3.select(this.chartArea).selectAll('circle').data(this.props.data);
+        const lines = d3.select(this.chartArea).selectAll('line').data(this.props.data);
         // Define the circle variables
-        const radius = 4;
+        const radius = 2;
         // Add the first circle
-        circles.enter()
+        redCircles.enter()
             .append('circle')
-            .merge(circles)
+            .merge(redCircles)
             .attr('cx', (d) => {
                 return this.xScale(d.x)
             })
@@ -102,9 +102,9 @@ class CascadingPlot extends Component {
             .on('mouseout', tip.hide);
 
         // Add the second circle
-        circles.enter()
+        greenCircles.enter()
             .append('circle')
-            .merge(circles)
+            .merge(greenCircles)
             .attr('cx', (d) => {
                 return this.xScale(d.e)
             })
@@ -116,9 +116,13 @@ class CascadingPlot extends Component {
                 this.fetchTooltip(target, d, tip);
             })
             .on('mouseout', tip.hide);
-
-        circles.exit().remove();
-        lines.exit().remove();
+        
+        greenCircles.exit().transition()
+            .attr("r", 0).remove();
+        redCircles.exit().transition()
+            .attr("r", 0).remove();
+        lines.exit().transition()
+            .attr("r", 0).remove();
 
         d3.select(this.chartArea).call(tip);
 
@@ -126,20 +130,16 @@ class CascadingPlot extends Component {
 
     updateAxes() {
         let xAxisFunction = d3.axisBottom(this.xScale)
-            .tickFormat(d3.timeFormat("%d-%b-%Y"))
+            .tickFormat(d3.timeFormat("%b-%Y"))
             .ticks(10)
-            .tickPadding(1);
+            .tickPadding(2);
 
         let yAxisFunction = d3.axisLeft()
             .scale(this.yScale)
             .ticks(5, 's');
 
         d3.select(this.xAxis)
-            .append("g")			
-            .attr("class", "grid")
-            .call(xAxisFunction
-                .tickSize(-this.props.height)
-            )
+            .call(xAxisFunction)
 
         d3.select(this.yAxis)
             .call(yAxisFunction);
@@ -218,8 +218,8 @@ class CascadingPlot extends Component {
 }
 CascadingPlot.defaultProps = {
     data: [{ x: 10, y: 20 }, { x: 15, y: 35 }],
-    width: 800,
-    height: 500,
+    width: 850,
+    height: 600,
     radius: 5,
     color: "blue",
     margin: {
@@ -230,7 +230,7 @@ CascadingPlot.defaultProps = {
     },
     xTitle: "X Title",
     yTitle: "Y Title",
-    labelsWidth: 300,
+    labelsWidth: 200,
     options: []
 };
       

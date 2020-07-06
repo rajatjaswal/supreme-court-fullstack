@@ -19,13 +19,15 @@ export class Slider extends React.Component {
           clickablePips 
           pips={{ mode: "count", values: 10 }}
           onUpdate = {(data)=>this.onUpdate(data)}
-          // onChange = {()=> this.props.onChange()}
 
         />
     )
   }
 
   onUpdate = (date) => {
-    this.props.onChange(date);
+    const newDate = [...date];
+    newDate[0] = new Date(parseInt(newDate[0])).toLocaleDateString();
+    newDate[1] = new Date(parseInt(newDate[1])).toLocaleDateString();
+    this.props.onChange(newDate);
   }
 }
