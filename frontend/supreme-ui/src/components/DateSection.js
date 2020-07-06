@@ -6,7 +6,7 @@ export class DateSection extends React.Component {
         super(props);
         this.state = {
             startDate: '8/2/1791',
-            endDate: '8/2/1810',
+            endDate: '8/2/1800',
         }
     }
     render() {
