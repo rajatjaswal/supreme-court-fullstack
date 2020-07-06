@@ -1,6 +1,6 @@
 import React from 'react';
 import DatePicker from "react-datepicker";
-import {Button} from 'react-bootstrap';
+import {Button, Container, Row, Col} from 'react-bootstrap';
 export class DateSection extends React.Component {
     constructor(props){
         super(props);
@@ -13,12 +13,21 @@ export class DateSection extends React.Component {
 
         return(
             <div>
-                <Button
-                variant="primary"
-                onClick={() => this.props.onClick(this.state)}
-                >Change Dates</Button>
-                <DatePicker selected={new Date(this.state.startDate)} onChange={this.handleStartChange}/>
-                <DatePicker selected={new Date(this.state.endDate)} onChange={this.handleEndChange}/>
+                <Container>
+                    <Row>
+                        <Col>
+                            Start Date: <DatePicker selected={new Date(this.state.startDate)} onChange={this.handleStartChange}/>
+                        </Col>
+                        <Col>
+                            End Date: <DatePicker selected={new Date(this.state.endDate)} onChange={this.handleEndChange}/>
+                        </Col>
+                        <Col>
+                            <Button variant="primary" onClick={() => this.props.onClick(this.state)}>Change Dates</Button>
+                        </Col>
+                    </Row>
+                </Container>
+                
+                
             </div>
         )
     }

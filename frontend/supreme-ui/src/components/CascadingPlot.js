@@ -64,14 +64,15 @@ class CascadingPlot extends Component {
                  </div>`;
         });
 
-        const circles = d3.select(this.chartArea).selectAll('circle').data(this.props.data);
+        const redCircles = d3.select(this.chartArea).selectAll('circle').data(this.props.data);
+        const greenCircles = d3.select(this.chartArea).selectAll('circle').data(this.props.data);
         const lines = d3.select(this.chartArea).selectAll('line').data(this.props.data);
         // Define the circle variables
         const radius = 2;
         // Add the first circle
-        circles.enter()
+        redCircles.enter()
             .append('circle')
-            .merge(circles)
+            .merge(redCircles)
             .attr('cx', (d) => {
                 return this.xScale(d.x)
             })
@@ -101,9 +102,9 @@ class CascadingPlot extends Component {
             .on('mouseout', tip.hide);
 
         // Add the second circle
-        circles.enter()
+        greenCircles.enter()
             .append('circle')
-            .merge(circles)
+            .merge(greenCircles)
             .attr('cx', (d) => {
                 return this.xScale(d.e)
             })
@@ -116,7 +117,9 @@ class CascadingPlot extends Component {
             })
             .on('mouseout', tip.hide);
         
-        circles.exit().transition()
+        greenCircles.exit().transition()
+            .attr("r", 0).remove();
+        redCircles.exit().transition()
             .attr("r", 0).remove();
         lines.exit().transition()
             .attr("r", 0).remove();
@@ -136,11 +139,7 @@ class CascadingPlot extends Component {
             .ticks(5, 's');
 
         d3.select(this.xAxis)
-            // .append("g")			
-            // .attr("class", "grid")
-            .call(xAxisFunction
-                // .tickSize(-this.props.height)
-            )
+            .call(xAxisFunction)
 
         d3.select(this.yAxis)
             .call(yAxisFunction);
