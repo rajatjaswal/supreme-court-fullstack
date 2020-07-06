@@ -1,6 +1,8 @@
 import React from 'react';
 import CascadingPlot from './CascadingPlot';
-import { Slider } from './Slider';
+// import { Slider } from './Slider';
+import "react-datepicker/dist/react-datepicker.css";
+import { DateSection } from './DateSection';
 
 export class CascadingMain extends React.Component {
     constructor(props) {
@@ -11,17 +13,21 @@ export class CascadingMain extends React.Component {
             data: [],
             xVar: 'startDate',
             yVar: 'case',
-            startDate: new Date('8/2/1791').getTime(),
-            endDate: new Date('8/2/1830').getTime()
+            startDate: '8/2/1791',
+            endDate: '8/2/1810',
         };
     }
 
-    componentWillUpdate(prevProps, prevState) {
-        if(this.state.startDate !== prevState.startDate || this.state.endDate !== prevState.endDate ){
-            const startDate = new Date(parseInt(this.state.startDate)).toISOString();
-            const endDate = new Date(parseInt(this.state.endDate)).toISOString();
+    componentDidMount() {
+        fetch(`http://localhost:3500/cases/date?startDate=${this.state.startDate}&endDate=${this.state.endDate}`).then(res => res.json()).then((res) => {
+            this.setState({data: res})
+        })
+    }
+
+    componentWillUpdate(nextProps, nextState) {
+        if(this.state.startDate !== nextState.startDate || this.state.endDate !== nextState.endDate ){
             // Load data when the component mounts
-            fetch(`http://localhost:3500/cases/date?startDate=${startDate}&endDate=${endDate}`).then(res => res.json()).then((res) => {
+            fetch(`http://localhost:3500/cases/date?startDate=${nextState.startDate}&endDate=${nextState.endDate}`).then(res => res.json()).then((res) => {
                 this.setState({data: res})
             })
         } 
@@ -42,7 +48,8 @@ export class CascadingMain extends React.Component {
 
         return (
             <div className="container">
-
+                
+                <DateSection startDate={this.state.startDate} endDate={this.state.endDate} onClick = {(data) => this.setState({startDate: data.startDate, endDate: data.endDate})}/>
                 {/* Render scatter plot */}
                 <CascadingPlot
                     xTitle={this.state.xVar}
@@ -50,13 +57,6 @@ export class CascadingMain extends React.Component {
                     data={allData}
                     allOptions = {allOptions}
                     />
-                <Slider 
-                    minDate="01/01/1971" 
-                    maxDate="12/01/2010" 
-                    start={this.state.startDate} 
-                    end={this.state.endDate} 
-                    onChange={(date)=> this.setState({startDate: date[0], endDate: date[1]})}
-                />
             </div>
         )
     }
