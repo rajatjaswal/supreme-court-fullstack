@@ -1,5 +1,4 @@
-# Coding Exercise 
-## Supreme Court Data Visualization Full Stack Application
+# Supreme Court Data Visualization Full Stack Application
 
 ## Technology Stack
 
